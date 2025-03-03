@@ -1,0 +1,44 @@
+﻿@model List<CategoryResponse>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4 p-3">
+        <h3>Category Data</h3>
+        <a asp-controller="Category" asp-action="Add" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Category
+        </a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-striped border">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+                <tbody>
+                    @foreach (var category in Model)
+                    {
+                        <tr>
+                            <td >@category.Id</td>
+                            <td>@category.Name</td>
+                            <td>
+                                
+                                <div class="dropdown">
+                                    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        Actions
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a asp-action="Update" asp-route-id="@category.Id" class="dropdown-item">View Or Edit</a>
+                                        <form asp-action="Delete" asp-route-id="@category.Id" method="post" style="display:inline;">
+                                            <button type="submit" class="dropdown-item">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+               </tbody>
+        </table>
+    </div>
+</div>

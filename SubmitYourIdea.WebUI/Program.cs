@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddHttpClient("ApiClient", client => 
     {
-        client.BaseAddress = new Uri("http://localhost:5199/api/");
+        client.BaseAddress = new Uri("http://localhost:5170/api/");
     });
     builder.Services.AddScoped<ITokenService, TokenService>();
     builder.Services.AddScoped<IBaseApiClient, BaseApiClient>();

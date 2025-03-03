@@ -4,8 +4,8 @@ namespace SubmitYourIdea.WebUI.Models;
 
 public class ApiResponse<T>
 {
-    public bool IsSuccess { get; set; } // Indicates whether the request was successful
-    public T? Data { get; set; }        // The response data (if successful)
-    public ApiError? Error { get; set; } // Error details (if failed)
-    public HttpStatusCode StatusCode { get; set; } // HTTP status code
+    public bool IsSuccess { get; set; } 
+    public T? Data { get; set; }
+    public ApiError? Error { get; set; }
+    public HttpStatusCode StatusCode { get; set; } 
 }

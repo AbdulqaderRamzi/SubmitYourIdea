@@ -8,6 +8,6 @@ public interface ICategoryService
     Task<ApiResponse<List<CategoryResponse>>> GetCategories();
     Task<ApiResponse<CategoryResponse>> GetCategoryById(int id);
     Task<ApiResponse<CategoryResponse>> AddCategory(AddCategoryRequest request);
-    Task<ApiResponse<object>> UpdateGenre(UpdateCategoryRequest request);
-    Task<ApiResponse<object>> DeleteGenre(int id);
+    Task<ApiResponse<object>> UpdateCategory(UpdateCategoryRequest request);
+    Task<ApiResponse<object>> DeleteCategory(int id);
 }

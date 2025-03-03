@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SubmitYourIdea.ApiModels.Auth;
 using SubmitYourIdea.ApiModels.Category;
 using SubmitYourIdea.Services.Interfaces;
 
 namespace SubmitYourIdea.Api.Controllers;
 
 [Route("api/categories")]
+[Authorize(Roles = Roles.Admin)]
 public class CategoriesController : ApiController
 {
     private readonly ICategoryService _categoryService;
@@ -37,7 +40,7 @@ public class CategoriesController : ApiController
     {
         var result = await _categoryService.AddCategory(request);
         return result.Match(
-            category => CreatedAtAction(nameof(GetCategoryById), new { id = category.Id }),
+            category => Ok(category),
             error => Problem(error));
     }
 

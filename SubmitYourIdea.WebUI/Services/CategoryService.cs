@@ -36,7 +36,7 @@ public class CategoryService : ICategoryService
             request);
     }
 
-    public async Task<ApiResponse<object>> UpdateGenre(UpdateCategoryRequest request)
+    public async Task<ApiResponse<object>> UpdateCategory(UpdateCategoryRequest request)
     {
         return await _client.SendAsync<UpdateCategoryRequest, object>(
             HttpMethod.Put, 
@@ -44,7 +44,7 @@ public class CategoryService : ICategoryService
             request);
     }
 
-    public async Task<ApiResponse<object>> DeleteGenre(int id)
+    public async Task<ApiResponse<object>> DeleteCategory(int id)
     {
         return await _client.SendAsync<int, object>(
             HttpMethod.Delete, 
