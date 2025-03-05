@@ -1,4 +1,6 @@
+using System.Net;
 using ErrorOr;
+using SubmitYourIdea.ApiModels.Api;
 
 namespace SubmitYourIdea.Services.Errors;
 
@@ -17,10 +19,21 @@ public static class AuthenticationErrors {
         description: "Invalid credentials"
     );
         
-    public static Error ExpiredRefreshToken => Error.Validation(
-        code: "User.ExpiredRefreshToken", 
-        description: "The refresh token has expired"
-    );
+    public static ApiResponse<T> NotFound<T>()
+    {
+        return new ApiResponse<T>
+        {
+            IsSuccess = false,
+            StatusCode = (int)HttpStatusCode.NotFound,
+            ProblemDetails = new ProblemDetails
+            {
+                Status = (int)HttpStatusCode.NotFound,
+                Title = "Idea Not Found",
+                Detail = "Could not find the specified Idea.",
+                
+            }
+        };
+    }
     
     public static Error AccessDenied => Error.Validation(
         code: "User.AccessDenied", 

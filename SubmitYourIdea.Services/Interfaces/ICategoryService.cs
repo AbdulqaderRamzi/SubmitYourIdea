@@ -1,4 +1,5 @@
 ﻿using ErrorOr;
+using SubmitYourIdea.ApiModels.Api;
 using SubmitYourIdea.ApiModels.Category;
 using SubmitYourIdea.DataAccess.Entities;
 
@@ -6,9 +7,9 @@ namespace SubmitYourIdea.Services.Interfaces;
 
 public interface ICategoryService
 {
-    Task<ErrorOr<List<CategoryResponse>>> GetCategories();
-    Task<ErrorOr<CategoryResponse>> GetCategoryById(int id);
-    Task<ErrorOr<CategoryResponse>> AddCategory(AddCategoryRequest category);
-    Task<ErrorOr<Success>> UpdateCategory(UpdateCategoryRequest idea);
-    Task<ErrorOr<Success>> DeleteCategory(int id);
+    Task<ApiResponse<List<CategoryResponse>>> Get();
+    Task<ApiResponse<CategoryResponse>> Get(int id);
+    Task<ApiResponse<CategoryResponse>> Add(AddCategoryRequest category);
+    Task<ApiResponse<object>> Update(UpdateCategoryRequest idea);
+    Task<ApiResponse<object>> Delete(int id);
 }

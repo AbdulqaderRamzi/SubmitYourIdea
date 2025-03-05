@@ -18,47 +18,57 @@ public class CategoriesController : ApiController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCategories()
+    public async Task<IActionResult> Get()
     {
-        var result = await _categoryService.GetCategories();
-        return result.Match(
-            categories => Ok(categories),
-            error => Problem(error));
+        var result = await _categoryService.Get();
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetCategoryById(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        var result = await _categoryService.GetCategoryById(id);
-        return result.Match(
-            category => Ok(category),
-            error => Problem(error));
+        var result = await _categoryService.Get(id);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddCategory(AddCategoryRequest request)
+    public async Task<IActionResult> Add(AddCategoryRequest request)
     {
-        var result = await _categoryService.AddCategory(request);
-        return result.Match(
-            category => Ok(category),
-            error => Problem(error));
+        var result = await _categoryService.Add(request);
+        if (result.IsSuccess)
+        {
+            return Ok(result.Data);
+        }
+        return BadRequest(result);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateCategory(UpdateCategoryRequest request)
+    public async Task<IActionResult> Update(UpdateCategoryRequest request)
     {
-        var result = await _categoryService.UpdateCategory(request);
-        return result.Match(
-            _ => NoContent(),
-            error => Problem(error));
+        var result = await _categoryService.Update(request);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteCategory(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var result = await _categoryService.DeleteCategory(id);
-        return result.Match(
-            _ => NoContent(),
-            error => Problem(error));
+        var result = await _categoryService.Delete(id);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
 }

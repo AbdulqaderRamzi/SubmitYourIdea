@@ -1,6 +1,7 @@
 ﻿using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SubmitYourIdea.ApiModels.Api;
 
 namespace SubmitYourIdea.Api.Controllers;
 

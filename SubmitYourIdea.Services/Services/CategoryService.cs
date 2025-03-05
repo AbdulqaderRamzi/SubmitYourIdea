@@ -1,5 +1,6 @@
-﻿using ErrorOr;
+﻿using System.Net;
 using Microsoft.EntityFrameworkCore;
+using SubmitYourIdea.ApiModels.Api;
 using SubmitYourIdea.ApiModels.Category;
 using SubmitYourIdea.DataAccess;
 using SubmitYourIdea.Services.Errors;
@@ -17,67 +18,94 @@ public class CategoryService : ICategoryService
         _db = db;
     }
 
-    public async Task<ErrorOr<List<CategoryResponse>>> GetCategories()
+    public async Task<ApiResponse<List<CategoryResponse>>> Get()
     {
-        return await _db.Categories
+        var categories = await _db.Categories
             .Select(x => x.ToCategoryResponse())
             .ToListAsync();
+        return new ApiResponse<List<CategoryResponse>>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = categories
+        };
     }
 
-    public async Task<ErrorOr<CategoryResponse>> GetCategoryById(int id)
+    public async Task<ApiResponse<CategoryResponse>> Get(int id)
     {
         var category = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
         if (category is null)
-            return CategoryErrors.CategoryNotFound;
-        return category.ToCategoryResponse();
+            return CategoryErrors.NotFound<CategoryResponse>();
+        return new ApiResponse<CategoryResponse>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = category.ToCategoryResponse()
+        };
     }
 
-    public async Task<ErrorOr<CategoryResponse>> AddCategory(AddCategoryRequest request)
+    public async Task<ApiResponse<CategoryResponse>> Add(AddCategoryRequest request)
     {
         var categoryName = request.Name.Trim().ToLower();
 
         if (await _db.Categories.AnyAsync(genre => genre.Name == categoryName))
         {
-            return CategoryErrors.DuplicatedCategory;
+            return CategoryErrors.Duplication<CategoryResponse>();
         }
 
         var category = request.ToCategory();
         await _db.Categories.AddAsync(category);
         await _db.SaveChangesAsync();
-        return category.ToCategoryResponse();
+        
+        return new ApiResponse<CategoryResponse>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = category.ToCategoryResponse()
+        };
     }
 
-    public async Task<ErrorOr<Success>> UpdateCategory(UpdateCategoryRequest request)
+    public async Task<ApiResponse<object>> Update(UpdateCategoryRequest request)
     {
         var categoryName = request.Name.Trim().ToLower();
         var isExist = await _db.Categories
             .AnyAsync(c => c.Id != request.Id && c.Name == categoryName);
         if (isExist)
         {
-            return CategoryErrors.DuplicatedCategory;
+            return CategoryErrors.Duplication<object>();
         }
 
         var category = _db.Categories.FirstOrDefault(x => x.Id == request.Id);
         if (category is null)
         {
-            return CategoryErrors.CategoryNotFound;
+            return CategoryErrors.NotFound<object>();
         }
 
         category.Name = categoryName;
         await _db.SaveChangesAsync();
-        return Result.Success;
+        return new ApiResponse<object>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = category.ToCategoryResponse()
+        };
     }
 
-    public async Task<ErrorOr<Success>> DeleteCategory(int id)
+    public async Task<ApiResponse<object>> Delete(int id)
     {
         var category = _db.Categories.FirstOrDefault(x => x.Id == id);
         if (category is null)
         {
-            return CategoryErrors.DuplicatedCategory;
+            return CategoryErrors.Duplication<object>();
         }
 
         _db.Categories.Remove(category);
         await _db.SaveChangesAsync();
-        return Result.Success;
+        return new ApiResponse<object>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = category.ToCategoryResponse()
+        };
     }
 }

@@ -1,9 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
+using System.Security.Claims;
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using SubmitYourIdea.ApiModels.Api;
 using SubmitYourIdea.ApiModels.Auth;
 using SubmitYourIdea.ApiModels.Idea;
 using SubmitYourIdea.DataAccess;
@@ -19,7 +21,6 @@ public class IdeaService : IIdeaService
     private readonly ApplicationDbContext _db;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly UserManager<AppUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IEmailSender _emailSender;
     
     public IdeaService(
@@ -32,27 +33,26 @@ public class IdeaService : IIdeaService
         _db = db;
         _httpContextAccessor = httpContextAccessor;
         _userManager = userManager;
-        _roleManager = roleManager;
         _emailSender = emailSender;
     }
 
-    public async Task<ErrorOr<List<IdeaResponse>>> Get()
+    public async Task<ApiResponse<List<IdeaResponse>>> Get()
     {
         var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
         {
-            return IdeaErrors.InvalidOperation;
+            return AuthenticationErrors.NotFound<List<IdeaResponse>>();
         }
         
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
         {
-            return IdeaErrors.InvalidOperation;
+            return AuthenticationErrors.NotFound<List<IdeaResponse>>();
         }
 
         var role = _userManager.GetRolesAsync(user).Result.First();
 
-        return role == Roles.Admin
+        var ideas = role == Roles.Admin
             ? await _db.Ideas
                 .Include(x => x.Category)
                 .Select(x => x.ToIdeaResponse())
@@ -62,24 +62,47 @@ public class IdeaService : IIdeaService
                 .Where(x => x.UserId == userId)
                 .Select(x => x.ToIdeaResponse())
                 .ToListAsync();
+
+        return new ApiResponse<List<IdeaResponse>>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = ideas
+        };
     }
 
-    public async Task<ErrorOr<IdeaResponse>> Get(int id)
+    public async Task<ApiResponse<IdeaResponse>> Get(int id)
     {
         var idea = await _db.Ideas
             .Include(x => x.Category)
             .FirstOrDefaultAsync(x => x.Id == id);
         if (idea is null)
-            return IdeaErrors.IdeaNotFound;
-        return idea.ToIdeaResponse();    }
+        {
+            return IdeaErrors.NotFound<IdeaResponse>();
+        }
 
-    public async Task<ErrorOr<IdeaResponse>> Add(AddIdeaRequest request)
+        return new ApiResponse<IdeaResponse>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = idea.ToIdeaResponse()
+        };
+        
+    }
+
+    public async Task<ApiResponse<IdeaResponse>> Add(AddIdeaRequest request)
     {
         var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId is null || request.CategoryId is 0)
+        if (userId is null)
         {
-            return IdeaErrors.InvalidOperation;
+            return AuthenticationErrors.NotFound<IdeaResponse>();
         }
+
+        if (request.CategoryId is 0)
+        {
+            return CategoryErrors.NotFound<IdeaResponse>();
+        }
+
         var idea = request.ToIdea();
         
         idea.CreatedAt = DateTime.UtcNow;
@@ -95,83 +118,107 @@ public class IdeaService : IIdeaService
 
         if (savedIdea is null)
         {
-            return IdeaErrors.IdeaNotFound; 
+            return IdeaErrors.NotFound<IdeaResponse>();
         }
         
-       
-        return savedIdea.ToIdeaResponse();
+        return new ApiResponse<IdeaResponse>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = idea.ToIdeaResponse()
+        };
         
     }
 
-    public async Task<ErrorOr<Success>> Update(UpdateIdeaRequest request)
+    public async Task<ApiResponse<object>> Update(UpdateIdeaRequest request)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == request.Id);
         if (idea is null)
         {
-            return IdeaErrors.IdeaNotFound;
+            return IdeaErrors.NotFound<object>();
         }
         idea.Title = request.Title;
         idea.Description = request.Description;
         idea.CategoryId = request.CategoryId;
-        
         await _db.SaveChangesAsync();
-        return Result.Success;
+        
+        return new ApiResponse<object>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = idea.ToIdeaResponse()
+        };
     }
 
-    public async Task<ErrorOr<Success>> Delete(int id)
+    public async Task<ApiResponse<object>> Delete(int id)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == id);
         if (idea is null)
         {
-            return IdeaErrors.IdeaNotFound;
+            return IdeaErrors.NotFound<object>();
         }
 
         _db.Ideas.Remove(idea);
         await _db.SaveChangesAsync();
-        return Result.Success;
+        return new ApiResponse<object>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = idea.ToIdeaResponse()
+        };
     }
     
-    public async Task<ErrorOr<Success>> Approve(int id)
+    public async Task<ApiResponse<object>> Approve(int id)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == id);
         if (idea is null)
         {
-            return IdeaErrors.IdeaNotFound;
+            return IdeaErrors.NotFound<object>();
         }
 
         if (idea.Status != Status.Pending)
         {
-            return IdeaErrors.InvalidOperation;
+            return IdeaErrors.InvalidOperation<object>();
         }
 
         idea.Status = Status.Approved;
         await _db.SaveChangesAsync();
-        _emailSender.SendEmailAsync(
+        await _emailSender.SendEmailAsync(
             "3boodg9@gmail.com",
             "Idea Response",
             "Your Idea has been approved.");
-        return Result.Success;
+        return new ApiResponse<object>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = idea.ToIdeaResponse()
+        };
     }
 
-    public async Task<ErrorOr<Success>> Decline(int id)
+    public async Task<ApiResponse<object>> Decline(int id)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == id);
         if (idea is null)
         {
-            return IdeaErrors.IdeaNotFound;
+            return AuthenticationErrors.NotFound<object>();
         }
         
         if (idea.Status != Status.Pending)
         {
-            return IdeaErrors.InvalidOperation;
+           return IdeaErrors.InvalidOperation<object>();
         }
         
         idea.Status = Status.Declined;
         await _db.SaveChangesAsync();
-        _emailSender.SendEmailAsync(
+        await _emailSender.SendEmailAsync(
             "3boodg9@gmail.com",
             "Idea Response",
             "Your Idea has been declined.");
-        return Result.Success;
+        return new ApiResponse<object>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = idea.ToIdeaResponse()
+        };
     }
 }

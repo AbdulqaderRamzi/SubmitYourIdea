@@ -20,64 +20,78 @@ public class IdeasController : ApiController
     public async Task<IActionResult> Get()
     {
         var result = await _ideaService.Get();
-        return result.Match(
-            ideas => Ok(ideas),
-            error => Problem(error));
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id)
     {
         var result = await _ideaService.Get(id);
-        return result.Match(
-            idea => Ok(idea),
-            error => Problem(error));
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
 
     [HttpPost]
     public async Task<IActionResult> Add(AddIdeaRequest request)
     {
         var result = await _ideaService.Add(request);
-        return result.Match(
-            idea => Ok(idea),
-            error => Problem(error));
+        if (result.IsSuccess)
+        {
+            return Ok(result.Data);
+        }
+        return BadRequest(result);
     }
 
     [HttpPut]
     public async Task<IActionResult> Update(UpdateIdeaRequest request)
     {
         var result = await _ideaService.Update(request);
-        return result.Match(
-            success => NoContent(),
-            error => Problem(error));
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _ideaService.Delete(id);
-        return result.Match(
-            success => Ok(success),
-            error => Problem(error));
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
     
     [HttpPost("approve/{id:int}")]
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Approve(int id)
     {
-        var result = await _ideaService.Approve(id);
-        return result.Match(
-            success => NoContent(),
-            error => Problem(error));
-    } 
-    
+        var result = await _ideaService.Delete(id);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
+    }
+
     [HttpPost("decline/{id:int}")]
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Decline(int id)
     {
-        var result = await _ideaService.Decline(id);
-        return result.Match(
-            success => NoContent(),
-            error => Problem(error));
+        var result = await _ideaService.Delete(id);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     } 
 }
