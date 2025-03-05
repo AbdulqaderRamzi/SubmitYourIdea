@@ -67,6 +67,6 @@ public class UserService : IUserService
         var role = _userManager.GetRolesAsync(user).Result.First();
         var accessToken = _jwtTokenGenerator.GetAccessToken(user, role);
 
-        return user.ToAuthResponse(accessToken, Roles.Visitor);
+        return user.ToAuthResponse(accessToken, role);
     }
 }

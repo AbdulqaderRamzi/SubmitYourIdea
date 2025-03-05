@@ -47,13 +47,8 @@ public class IdeaController : Controller
             ViewBag.Categories = new SelectList(categories.Data, "Id", "Name");
             return View(request);
         }
-
-        var idea = new AddIdeaRequest(
-            Title: request.Title,
-            Description: request.Description,
-            CategoryId: request.CategoryId);
         
-        var response = await _ideaService.AddIdea(idea);
+        var response = await _ideaService.AddIdea(request);
         if (response.IsSuccess) return RedirectToAction("Index");
         
         ModelState.AddModelError("", response.Error!.Title!);
@@ -95,14 +90,8 @@ public class IdeaController : Controller
             ViewBag.Categories = new SelectList(categories.Data, "Id", "Name");
             return View(request);
         }
-
-        var updateIdeaRequest = new UpdateIdeaRequest(
-            Id: request.Id,
-            Title: request.Title,
-            Description: request.Description,
-            CategoryId: request.CategoryId);
         
-        var response = await _ideaService.UpdateIdea(updateIdeaRequest);
+        var response = await _ideaService.UpdateIdea(request);
         if (response.IsSuccess) return RedirectToAction("Index");
         
         ModelState.AddModelError("", response.Error!.Title!);
@@ -112,17 +101,11 @@ public class IdeaController : Controller
         return View(request);
     }
     
-    [HttpGet]
+    [HttpPost]
     public async Task<IActionResult> Delete(int id)
     {
         if (id is 0) return NotFound();
-        
-        var response = await _ideaService.GetIdeaById(id);
-        if (response.IsSuccess)
-        {
-            return View(response.Data);
-        }
-        
+        await _ideaService.DeleteIdea(id);
         return RedirectToAction("Index");
     }
     
@@ -131,8 +114,7 @@ public class IdeaController : Controller
     public async Task<IActionResult> Approve(int id)
     {
         if (id is 0) return NotFound();
-        
-        var response = await _ideaService.ApproveIdea(id);
+        await _ideaService.ApproveIdea(id);
         return RedirectToAction("Index");
     }
     
@@ -141,8 +123,7 @@ public class IdeaController : Controller
     public async Task<IActionResult> Decline(int id)
     {
         if (id is 0) return NotFound();
-        
-        var response = await _ideaService.DeclineIdea(id);
+        await _ideaService.DeclineIdea(id);
         return RedirectToAction("Index");
     }
 }

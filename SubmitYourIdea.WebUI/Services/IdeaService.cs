@@ -57,7 +57,7 @@ public class IdeaService : IIdeaService
     public async Task<ApiResponse<object>> ApproveIdea(int id)
     {
         return await _client.SendAsync<int, object>(
-            HttpMethod.Delete, 
+            HttpMethod.Post, 
             $"ideas/approve/{id}",
             id);
         
@@ -66,7 +66,7 @@ public class IdeaService : IIdeaService
     public async Task<ApiResponse<object>> DeclineIdea(int id)
     {
         return await _client.SendAsync<int, object>(
-            HttpMethod.Delete, 
+            HttpMethod.Post, 
             $"ideas/decline/{id}",
             id);
     }

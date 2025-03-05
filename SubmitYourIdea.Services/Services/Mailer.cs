@@ -15,7 +15,7 @@ public class Mailer : IMailer
             
             Credentials = new NetworkCredential("abood.reyhter@gmail.com", "yurs wuwe zpmb zpjl")
         };
- 
+        
         var message = new MailMessage(
             from: "abood.reyhter@gmail.com",
             to: emailData.Email,

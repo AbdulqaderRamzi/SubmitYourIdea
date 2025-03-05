@@ -6,12 +6,11 @@ namespace SubmitYourIdea.Services.Interfaces;
 
 public interface IIdeaService
 {
-    Task<ErrorOr<List<IdeaResponse>>> GetIdeas();
-    Task<ErrorOr<IdeaResponse>> GetIdeasById(int id);
-    Task<ErrorOr<IdeaResponse>>  AddIdea(AddIdeaRequest request);
-    Task<ErrorOr<Success>> UpdateIdea(UpdateIdeaRequest request);
-    Task<ErrorOr<Success>> DeleteIdea(int id);
-    
-    Task<ErrorOr<Success>> ApproveIdea(int id);
-    Task<ErrorOr<Success>> DeclineIdea(int id);
+    Task<ErrorOr<List<IdeaResponse>>> Get();
+    Task<ErrorOr<IdeaResponse>> Get(int id);
+    Task<ErrorOr<IdeaResponse>>  Add(AddIdeaRequest request);
+    Task<ErrorOr<Success>> Update(UpdateIdeaRequest request);
+    Task<ErrorOr<Success>> Delete(int id);
+    public Task<ErrorOr<Success>> Approve(int id);
+    public Task<ErrorOr<Success>> Decline(int id);
 }

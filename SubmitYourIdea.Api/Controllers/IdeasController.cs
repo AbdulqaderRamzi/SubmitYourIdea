@@ -17,55 +17,55 @@ public class IdeasController : ApiController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetIdeas()
+    public async Task<IActionResult> Get()
     {
-        var result = await _ideaService.GetIdeas();
+        var result = await _ideaService.Get();
         return result.Match(
             ideas => Ok(ideas),
             error => Problem(error));
     }
 
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetIdeaById(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        var result = await _ideaService.GetIdeasById(id);
+        var result = await _ideaService.Get(id);
         return result.Match(
             idea => Ok(idea),
             error => Problem(error));
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddIdea(AddIdeaRequest request)
+    public async Task<IActionResult> Add(AddIdeaRequest request)
     {
-        var result = await _ideaService.AddIdea(request);
+        var result = await _ideaService.Add(request);
         return result.Match(
             idea => Ok(idea),
             error => Problem(error));
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateIdea(UpdateIdeaRequest request)
+    public async Task<IActionResult> Update(UpdateIdeaRequest request)
     {
-        var result = await _ideaService.UpdateIdea(request);
+        var result = await _ideaService.Update(request);
         return result.Match(
             success => NoContent(),
             error => Problem(error));
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteIdea(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var result = await _ideaService.DeleteIdea(id);
+        var result = await _ideaService.Delete(id);
         return result.Match(
             success => Ok(success),
             error => Problem(error));
     }
-
+    
     [HttpPost("approve/{id:int}")]
     [Authorize(Roles = Roles.Admin)]
-    public async Task<IActionResult> ApproveIdea(int id)
+    public async Task<IActionResult> Approve(int id)
     {
-        var result = await _ideaService.ApproveIdea(id);
+        var result = await _ideaService.Approve(id);
         return result.Match(
             success => NoContent(),
             error => Problem(error));
@@ -73,9 +73,9 @@ public class IdeasController : ApiController
     
     [HttpPost("decline/{id:int}")]
     [Authorize(Roles = Roles.Admin)]
-    public async Task<IActionResult> DeclineIdea(int id)
+    public async Task<IActionResult> Decline(int id)
     {
-        var result = await _ideaService.DeclineIdea(id);
+        var result = await _ideaService.Decline(id);
         return result.Match(
             success => NoContent(),
             error => Problem(error));

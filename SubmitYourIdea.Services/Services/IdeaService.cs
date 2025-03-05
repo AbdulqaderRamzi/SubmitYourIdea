@@ -36,7 +36,7 @@ public class IdeaService : IIdeaService
         _emailSender = emailSender;
     }
 
-    public async Task<ErrorOr<List<IdeaResponse>>> GetIdeas()
+    public async Task<ErrorOr<List<IdeaResponse>>> Get()
     {
         var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null)
@@ -64,7 +64,7 @@ public class IdeaService : IIdeaService
                 .ToListAsync();
     }
 
-    public async Task<ErrorOr<IdeaResponse>> GetIdeasById(int id)
+    public async Task<ErrorOr<IdeaResponse>> Get(int id)
     {
         var idea = await _db.Ideas
             .Include(x => x.Category)
@@ -73,7 +73,7 @@ public class IdeaService : IIdeaService
             return IdeaErrors.IdeaNotFound;
         return idea.ToIdeaResponse();    }
 
-    public async Task<ErrorOr<IdeaResponse>> AddIdea(AddIdeaRequest request)
+    public async Task<ErrorOr<IdeaResponse>> Add(AddIdeaRequest request)
     {
         var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId is null || request.CategoryId is 0)
@@ -99,9 +99,11 @@ public class IdeaService : IIdeaService
         }
         
        
-        return savedIdea.ToIdeaResponse();    }
+        return savedIdea.ToIdeaResponse();
+        
+    }
 
-    public async Task<ErrorOr<Success>> UpdateIdea(UpdateIdeaRequest request)
+    public async Task<ErrorOr<Success>> Update(UpdateIdeaRequest request)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == request.Id);
         if (idea is null)
@@ -116,7 +118,7 @@ public class IdeaService : IIdeaService
         return Result.Success;
     }
 
-    public async Task<ErrorOr<Success>> DeleteIdea(int id)
+    public async Task<ErrorOr<Success>> Delete(int id)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == id);
         if (idea is null)
@@ -128,8 +130,8 @@ public class IdeaService : IIdeaService
         await _db.SaveChangesAsync();
         return Result.Success;
     }
-
-    public async Task<ErrorOr<Success>> ApproveIdea(int id)
+    
+    public async Task<ErrorOr<Success>> Approve(int id)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == id);
         if (idea is null)
@@ -151,7 +153,7 @@ public class IdeaService : IIdeaService
         return Result.Success;
     }
 
-    public async Task<ErrorOr<Success>> DeclineIdea(int id)
+    public async Task<ErrorOr<Success>> Decline(int id)
     {
         var idea = await _db.Ideas.FirstOrDefaultAsync(x => x.Id == id);
         if (idea is null)

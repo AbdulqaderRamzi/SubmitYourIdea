@@ -19,6 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IBaseApiClient, BaseApiClient>();
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<ICategoryService, CategoryService>();
+    builder.Services.AddScoped<IIdeaService, IdeaService>();
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(opt =>
         {

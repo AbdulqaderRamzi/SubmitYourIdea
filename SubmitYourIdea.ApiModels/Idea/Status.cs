@@ -2,7 +2,7 @@
 
 public class Status
 {
-    public const string Pending = "Pending";
+    public const string Pending = "pending";
     public const string Approved = "approved";
     public const string Declined = "declined";
 }

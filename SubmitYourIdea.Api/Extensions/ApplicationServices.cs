@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using SubmitYourIdea.DataAccess;
+using SubmitYourIdea.DataAccess.DbInitializer;
 using SubmitYourIdea.Services.Interfaces;
 using SubmitYourIdea.Services.Services;
 
@@ -24,6 +25,7 @@ public static class ApplicationServices
             includeInternalTypes: true);
         services.AddFluentValidationAutoValidation();
 
+        services.AddScoped<IDbInitializer, DbInitializer>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ICategoryService, CategoryService>();
