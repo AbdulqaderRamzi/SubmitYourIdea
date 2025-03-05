@@ -1,7 +1,5 @@
-﻿using ErrorOr;
-using SubmitYourIdea.ApiModels.Api;
+﻿using SubmitYourIdea.ApiModels.Api;
 using SubmitYourIdea.ApiModels.Idea;
-using SubmitYourIdea.DataAccess.Entities;
 
 namespace SubmitYourIdea.Services.Interfaces;
 

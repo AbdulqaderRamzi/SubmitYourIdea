@@ -1,23 +1,40 @@
 using System.Net;
-using ErrorOr;
 using SubmitYourIdea.ApiModels.Api;
 
 namespace SubmitYourIdea.Services.Errors;
 
 public static class AuthenticationErrors {
     
-    public static Error RegistrationFailed(string? description)
+    public static ApiResponse<T> InvalidOperation<T>()
     {
-        return Error.Failure(
-            code: "User.RegistrationFailed",
-            description: description ?? "Registration failed."
-        );
+        return new ApiResponse<T>
+        {
+            IsSuccess = false,
+            StatusCode = (int)HttpStatusCode.NotFound,
+            ProblemDetails = new ProblemDetails
+            {
+                Status = (int)HttpStatusCode.NotFound,
+                Title = "Invalid Operation",
+                Detail = "Could not complete the operation!",
+
+            }
+        };
     }
     
-    public static Error InvalidCredentials => Error.Validation(
-        code: "User.InvalidCredentials", 
-        description: "Invalid credentials"
-    );
+    public static ApiResponse<T> InvalidCredentials<T>()
+    {
+        return new ApiResponse<T>
+        {
+            IsSuccess = false,
+            StatusCode = (int)HttpStatusCode.NotFound,
+            ProblemDetails = new ProblemDetails
+            {
+                Status = (int)HttpStatusCode.NotFound,
+                Title = "Invalid Credentials",
+                Detail = "User name or password is incorrect.",
+            }
+        };
+    }
         
     public static ApiResponse<T> NotFound<T>()
     {
@@ -34,9 +51,4 @@ public static class AuthenticationErrors {
             }
         };
     }
-    
-    public static Error AccessDenied => Error.Validation(
-        code: "User.AccessDenied", 
-        description: "Access denied"
-    );
 }

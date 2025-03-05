@@ -20,18 +20,22 @@ public class AuthController : ApiController
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var authResult = await _userService.RegisterAsync(request);
-        return authResult.Match(
-            result => Ok(result),
-            error => Problem(error));
+        var result = await _userService.Register(request);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        var authResult = await _userService.LoginAsync(request);
-        return authResult.Match(
-            result => Ok(result),
-            error => Problem(error));
+        var result = await _userService.Login(request);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        } 
+        return BadRequest(result);
     }
 }

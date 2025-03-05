@@ -1,6 +1,6 @@
-﻿using ErrorOr;
+﻿using System.Net;
 using Microsoft.AspNetCore.Identity;
-using SubmitYourIdea.ApiModels;
+using SubmitYourIdea.ApiModels.Api;
 using SubmitYourIdea.ApiModels.Auth;
 using SubmitYourIdea.DataAccess;
 using SubmitYourIdea.DataAccess.Entities;
@@ -28,45 +28,48 @@ public class UserService : IUserService
         _db = db;
     }
 
-    public async Task<ErrorOr<AuthenticationResponse>> RegisterAsync(RegisterRequest request)
+    public async Task<ApiResponse<AuthenticationResponse>> Register(RegisterRequest request)
     {
         var user = request.ToAppUser();
         var result = await _userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)
         {
-            return AuthenticationErrors.RegistrationFailed(
-                result.Errors.First().Description);
+            return AuthenticationErrors.InvalidOperation<AuthenticationResponse>();
         }
-
-        if (!await _roleManager.RoleExistsAsync(Roles.Admin))
-        {
-            await _roleManager.CreateAsync(new IdentityRole(Roles.Admin));
-            await _roleManager.CreateAsync(new IdentityRole(Roles.Visitor));
-        }
-        await _userManager.AddToRoleAsync(user, Roles.Visitor); // example
+        
+        await _userManager.AddToRoleAsync(user, Roles.Visitor);
 
         var accessToken = _jwtTokenGenerator.GetAccessToken(user, Roles.Visitor);
 
-        return user.ToAuthResponse(accessToken, Roles.Visitor);
-
+        return new ApiResponse<AuthenticationResponse>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = user.ToAuthResponse(accessToken, Roles.Visitor)
+        };
     }
 
-    public async Task<ErrorOr<AuthenticationResponse>> LoginAsync(LoginRequest request)
+    public async Task<ApiResponse<AuthenticationResponse>> Login(LoginRequest request)
     {
         if (await _userManager.FindByEmailAsync(request.Email) is not { } user)
         {
-            return AuthenticationErrors.InvalidCredentials;
+            return AuthenticationErrors.InvalidCredentials<AuthenticationResponse>();
         }
 
         if (!await _userManager.CheckPasswordAsync(user, request.Password))
         {
-            return AuthenticationErrors.InvalidCredentials;
+            return AuthenticationErrors.InvalidCredentials<AuthenticationResponse>();
         }
 
         var role = _userManager.GetRolesAsync(user).Result.First();
         var accessToken = _jwtTokenGenerator.GetAccessToken(user, role);
 
-        return user.ToAuthResponse(accessToken, role);
+        return new ApiResponse<AuthenticationResponse>
+        {
+            IsSuccess = true,
+            StatusCode = (int)HttpStatusCode.OK,
+            Data = user.ToAuthResponse(accessToken, role)
+        };
     }
 }

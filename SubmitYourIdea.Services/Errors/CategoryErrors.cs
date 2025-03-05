@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using ErrorOr;
 using SubmitYourIdea.ApiModels.Api;
 
 namespace SubmitYourIdea.Services.Errors;
