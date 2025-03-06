@@ -24,7 +24,6 @@ public static class ApplicationServices
             typeof(ApplicationServices).Assembly,
             includeInternalTypes: true);
         services.AddFluentValidationAutoValidation();
-
         services.AddScoped<IDbInitializer, DbInitializer>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IUserService, UserService>();

@@ -1,4 +1,7 @@
-﻿namespace SubmitYourIdea.Api.Middleware;
+﻿using System.Text.Json;
+using SubmitYourIdea.ApiModels.Api;
+
+namespace SubmitYourIdea.Api.Middleware;
 
 public class ExceptionMiddleware
 {
@@ -26,15 +29,21 @@ public class ExceptionMiddleware
         {
             _logger.LogError(e, e.Message);
             
-            context.Response.ContentType = "application/problem+json";
+            context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            
-            var problem = Results.Problem(
-                title: e.Message, 
-                detail: _env.IsDevelopment() ? e.StackTrace : "Internal Server Error", 
-                statusCode: context.Response.StatusCode);
-
-            await problem.ExecuteAsync(context);
+            var problemDetails = new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "Internal Server Error",
+                Detail = e.Message
+            };
+            var response = new ApiResponse<object>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status400BadRequest,
+                ProblemDetails = problemDetails
+            };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
     }
 }
