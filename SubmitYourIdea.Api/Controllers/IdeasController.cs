@@ -44,7 +44,7 @@ public class IdeasController : ApiController
         var result = await _ideaService.Add(request);
         if (result.IsSuccess)
         {
-            return Ok(result.Data);
+            return Ok(result);
         }
         return BadRequest(result);
     }
@@ -75,7 +75,7 @@ public class IdeasController : ApiController
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Approve(int id)
     {
-        var result = await _ideaService.Delete(id);
+        var result = await _ideaService.Approve(id);
         if (result.IsSuccess)
         {
             return Ok(result);
@@ -87,7 +87,7 @@ public class IdeasController : ApiController
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Decline(int id)
     {
-        var result = await _ideaService.Delete(id);
+        var result = await _ideaService.Decline(id);
         if (result.IsSuccess)
         {
             return Ok(result);

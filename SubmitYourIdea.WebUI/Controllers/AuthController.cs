@@ -31,7 +31,7 @@ public class AuthController : Controller
         var response = await _authService.RegisterAsync(request);
         if (!response.IsSuccess)
         {
-            ModelState.AddModelError("", response.Error!.Title!);
+            ModelState.AddModelError("", response.ProblemDetails!.Detail);
             return View(request);
         }
         var claimsPrincipal = _authService.AddClaims(response.Data!);
@@ -53,7 +53,7 @@ public class AuthController : Controller
         var response = await _authService.LoginAsync(request);
         if (!response.IsSuccess)
         {
-            ModelState.AddModelError("", response.Error!.Title!);
+            ModelState.AddModelError("", response.ProblemDetails!.Detail);
             return View(request);
         }
         var claimsPrincipal = _authService.AddClaims(response.Data!);

@@ -45,7 +45,7 @@ public class CategoriesController : ApiController
         var result = await _categoryService.Add(request);
         if (result.IsSuccess)
         {
-            return Ok(result.Data);
+            return Ok(result);
         }
         return BadRequest(result);
     }

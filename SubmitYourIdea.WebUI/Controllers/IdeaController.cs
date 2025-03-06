@@ -51,7 +51,7 @@ public class IdeaController : Controller
         var response = await _ideaService.AddIdea(request);
         if (response.IsSuccess) return RedirectToAction("Index");
         
-        ModelState.AddModelError("", response.Error!.Title!);
+        ModelState.AddModelError("", response.ProblemDetails!.Detail);
         
         var categoriesResponse = await _categoryService.GetCategories();
         ViewBag.Categories = new SelectList(categoriesResponse.Data, "Id", "Name");
@@ -94,7 +94,7 @@ public class IdeaController : Controller
         var response = await _ideaService.UpdateIdea(request);
         if (response.IsSuccess) return RedirectToAction("Index");
         
-        ModelState.AddModelError("", response.Error!.Title!);
+        ModelState.AddModelError("", response.ProblemDetails!.Detail);
         
         var categoriesResponse = await _categoryService.GetCategories();
         ViewBag.Categories = new SelectList(categoriesResponse.Data, "Id", "Name");

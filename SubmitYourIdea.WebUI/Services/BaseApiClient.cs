@@ -46,27 +46,20 @@ public class BaseApiClient : IBaseApiClient
 
         var response = await client.SendAsync(request);
         if (response.StatusCode == HttpStatusCode.Unauthorized && requiresAuth)
-        {
             throw new AuthException();
-        }
+        
         var content = await response.Content.ReadAsStringAsync();
         if (response.IsSuccessStatusCode)
         {
-            var result = JsonConvert.DeserializeObject<TResponse>(content);
-            return new ApiResponse<TResponse>
-            {
-                IsSuccess = true,
-                Data = result,
-                StatusCode = response.StatusCode
-            };
+            var result = JsonConvert.DeserializeObject<ApiResponse<TResponse>>(content);
+            if (result is null)
+                throw new Exception("Something went wrong");
+            return result;
         }
         
-        var apiError = JsonConvert.DeserializeObject<ApiError>(content);
-        return new ApiResponse<TResponse>
-        {
-            IsSuccess = false,
-            Error = apiError,
-            StatusCode = response.StatusCode
-        };
+        var problemDetails = JsonConvert.DeserializeObject<ApiResponse<TResponse>>(content);
+        if (problemDetails is null)
+            throw new Exception("Something went wrong");
+        return problemDetails;
     }
 }

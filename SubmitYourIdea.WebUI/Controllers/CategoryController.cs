@@ -33,7 +33,7 @@ public class CategoryController : Controller
       if (!ModelState.IsValid) return View(request);
       var response = await _categoryService.AddCategory(request);
       if (response.IsSuccess) return RedirectToAction("Index");
-      ModelState.AddModelError("", response.Error!.Title!);
+      ModelState.AddModelError("", response.ProblemDetails!.Detail);
       return View(request);
    }
    
@@ -60,7 +60,7 @@ public class CategoryController : Controller
     
       if (response.IsSuccess) return RedirectToAction("Index");
     
-      ModelState.AddModelError("", response.Error!.Title!);
+      ModelState.AddModelError("", response.ProblemDetails!.Detail);
       return View(request);
    }
    

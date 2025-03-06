@@ -182,10 +182,10 @@ public class IdeaService : IIdeaService
 
         idea.Status = Status.Approved;
         await _db.SaveChangesAsync();
-        await _emailSender.SendEmailAsync(
+        /*await _emailSender.SendEmailAsync(
             "3boodg9@gmail.com",
             "Idea Response",
-            "Your Idea has been approved.");
+            "Your Idea has been approved.");*/
         return new ApiResponse<object>
         {
             IsSuccess = true,
@@ -209,10 +209,10 @@ public class IdeaService : IIdeaService
         
         idea.Status = Status.Declined;
         await _db.SaveChangesAsync();
-        await _emailSender.SendEmailAsync(
+        /*await _emailSender.SendEmailAsync(
             "3boodg9@gmail.com",
             "Idea Response",
-            "Your Idea has been declined.");
+            "Your Idea has been declined.");*/
         return new ApiResponse<object>
         {
             IsSuccess = true,
